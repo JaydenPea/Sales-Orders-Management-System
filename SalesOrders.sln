@@ -3,11 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesOrders.Server", "SalesOrders\Server\SalesOrders.Server.csproj", "{DB399CF0-532B-4AC3-A394-FA291C66F220}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesOrders.Server", "SalesOrders\Server\SalesOrders.Server.csproj", "{DB399CF0-532B-4AC3-A394-FA291C66F220}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesOrders.Client", "SalesOrders\Client\SalesOrders.Client.csproj", "{8ED4D86D-2A4F-476B-B8CD-1A1D90220B72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesOrders.Client", "SalesOrders\Client\SalesOrders.Client.csproj", "{8ED4D86D-2A4F-476B-B8CD-1A1D90220B72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesOrders.Shared", "SalesOrders\Shared\SalesOrders.Shared.csproj", "{9198392E-1FA2-4898-9D25-9D3A2E113116}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesOrders.Shared", "SalesOrders\Shared\SalesOrders.Shared.csproj", "{9198392E-1FA2-4898-9D25-9D3A2E113116}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Client", "01 - Client", "{F7E3D7AA-C102-4849-84CB-816B9B0BDCC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Server", "02 - Server", "{5351560A-D239-45A4-9FD9-48133B42A048}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - BLL", "03 - BLL", "{AF7CEBC6-679C-4F97-BCBF-849368D784CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - DAL", "04 - DAL", "{CB8FC399-4972-49AC-9D40-EEE3923A6455}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +38,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DB399CF0-532B-4AC3-A394-FA291C66F220} = {5351560A-D239-45A4-9FD9-48133B42A048}
+		{8ED4D86D-2A4F-476B-B8CD-1A1D90220B72} = {F7E3D7AA-C102-4849-84CB-816B9B0BDCC2}
+		{9198392E-1FA2-4898-9D25-9D3A2E113116} = {AF7CEBC6-679C-4F97-BCBF-849368D784CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F5D97C7-6046-43A8-B447-C6A48A28696B}
