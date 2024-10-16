@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SalesOrders.DAL.Models;
@@ -18,13 +19,15 @@ namespace SalesOrders.Shared.User
         #region Injections
         private readonly SalesOrderDBContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         #endregion
 
         #region Constructors
-        public UserService(SalesOrderDBContext context, IConfiguration configuration)
+        public UserService(SalesOrderDBContext context, IConfiguration configuration , IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -83,6 +86,15 @@ namespace SalesOrders.Shared.User
             }
 
             return response;
+        }
+
+        public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        public string GetUserEmail() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+
+        public async Task<Users> GetUserByEmail(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.email.Equals(email));
         }
         #endregion
 

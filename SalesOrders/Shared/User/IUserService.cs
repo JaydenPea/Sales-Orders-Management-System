@@ -14,6 +14,6 @@ namespace SalesOrders.Shared.User
         Task<ServiceResponse<string>> Login(string email, string password);
         int GetUserId();
         string GetUserEmail();
-        Task<User> GetUserByEmail(string email);
+        Task<Users> GetUserByEmail(string email);
     }
 }
