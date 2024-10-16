@@ -22,6 +22,10 @@
       {
          "Name": "[dbo].[OrderLine]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Users]",
+         "ObjectType": 0
       }
    ],
    "UiHint": "fam001251\\sqlexpress01.SalesOrderDB.dbo",

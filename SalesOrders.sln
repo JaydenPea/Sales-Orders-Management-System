@@ -11,6 +11,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesOrders.Client", "SalesOrders\Client\SalesOrders.Client.csproj", "{8ED4D86D-2A4F-476B-B8CD-1A1D90220B72}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesOrders.Shared", "SalesOrders\Shared\SalesOrders.Shared.csproj", "{9198392E-1FA2-4898-9D25-9D3A2E113116}"
+	ProjectSection(ProjectDependencies) = postProject
+		{27CE1031-3679-4B27-B8A2-E0D9C9E1F2A8} = {27CE1031-3679-4B27-B8A2-E0D9C9E1F2A8}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SalesOrders.DAL", "SalesOrders.DAL\SalesOrders.DAL.csproj", "{27CE1031-3679-4B27-B8A2-E0D9C9E1F2A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Client", "01 - Client", "{F7E3D7AA-C102-4849-84CB-816B9B0BDCC2}"
 EndProject
@@ -19,8 +24,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - BLL", "03 - BLL", "{AF7CEBC6-679C-4F97-BCBF-849368D784CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - DAL", "04 - DAL", "{CB8FC399-4972-49AC-9D40-EEE3923A6455}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesOrders.DAL", "SalesOrders.DAL\SalesOrders.DAL.csproj", "{27CE1031-3679-4B27-B8A2-E0D9C9E1F2A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

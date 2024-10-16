@@ -1,0 +1,43 @@
+﻿@page "/register"
+@using SalesOrders.Shared.User
+
+<PageTitle>Register</PageTitle>
+
+<h3>Register</h3>
+
+
+<EditForm Model="user" OnInvalidSubmit="HandleRegistration">
+    
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="user.email" class="form-control"></InputText>
+        <ValidationMessage For="@(() => user.email)"></ValidationMessage>
+    </div>
+
+    <div class="mb-3">
+        <label for="password">Passwprd</label>
+        <InputText id="password" @bind-Value="user.password" class="form-control" typeof="" type="password"/>
+        <ValidationMessage For="@(() => user.password)"></ValidationMessage>
+    </div>
+
+    <div class="mb-3">
+        <label for="confirmPassword">Confirm Password</label>
+        <InputText id="confirmPassword" @bind-Value="user.confirmPassword" class="form-control" type="password" />
+        <ValidationMessage For="@(() => user.confirmPassword)"></ValidationMessage>
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+    
+</EditForm>
+
+
+
+@code {
+    UserRegister user = new UserRegister();
+
+
+    void HandleRegistration()
+    {
+        Console.WriteLine($"user with email {user.email}.");
+    }
+}
