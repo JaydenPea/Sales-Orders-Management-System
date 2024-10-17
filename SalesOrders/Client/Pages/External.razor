@@ -1,0 +1,89 @@
+﻿@page "/externalApi"
+@using SalesOrders.Client.Service.ExternalService
+@inject IExternalService ExternalS
+@attribute [Authorize]
+@using MudBlazor
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="my-8">
+    <MudGrid Justify="Justify.Center">
+        <MudGrid Justify="Justify.Center">
+            <!-- Fetch Button Card -->
+            <MudItem xs="12" md="6">
+                <MudCard Class="mb-4" Elevation="4">
+                    <MudCardContent Class="text-center">
+                        <MudText Typo="Typo.h5" Class="mb-2">Get a Random Dog Image</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-4">Click below to fetch a random image of a dog from the external API.</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="GetResponse" FullWidth="true">
+                            Fetch New Image
+                        </MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+        
+    
+        <!-- JSON Response Card -->
+        <MudItem xs="12" md="6">
+            <MudCard Class="mb-4" Elevation="4">
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" GutterBottom="true">API Response (JSON)</MudText>
+                    @if (!string.IsNullOrEmpty(jsonResponse))
+                    {
+                        <MudPaper Class="p-3" Elevation="2">
+                            <pre><code>@jsonResponse</code></pre>
+                        </MudPaper>
+                    }
+                    else if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mt-2">@errorMessage</MudAlert>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Image Display Card -->
+        <MudItem xs="12" md="6">
+            <MudCard Class="mb-4" Elevation="4">
+                <MudCardContent Class="text-center">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Dog Image</MudText>
+                    @if (!string.IsNullOrEmpty(imageUrl))
+                    {
+                        <img Src="@imageUrl" Alt="Random Dog" Width="300px" Class="mx-auto d-block mb-2" />
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body1" Color="Color.Secondary">No image fetched yet. Click "Fetch New Image" to get started!</MudText>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+
+@code {
+    private string jsonResponse = string.Empty;
+    private string imageUrl = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private async Task GetResponse()
+    {
+        try
+        {
+            var result = await ExternalS.externalCall();
+            if (result != null)
+            {
+                imageUrl = result.message;
+                jsonResponse = System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                errorMessage = null; // Clear error message if successful
+            }
+        }
+        catch (Exception ex)
+        {
+            // Display error message if an exception occurs
+            errorMessage = ex.Message;
+            jsonResponse = null; // Clear the JSON response on error
+            imageUrl = null;     // Clear the image on error
+        }
+    }
+}

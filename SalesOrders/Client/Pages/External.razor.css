@@ -1,0 +1,7 @@
+﻿pre {
+    background-color: #f8f9fa;
+    padding: 12px;
+    border-radius: 4px;
+    font-family: Consolas, "Courier New", monospace;
+    white-space: pre-wrap;
+}

@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
     <div class="page">
         <div class="sidebar">
@@ -8,6 +8,14 @@
 
         <main>
             <div class="top-row px-2">
+                @if (!string.IsNullOrEmpty(name))
+                {
+                    <h3>Hi! <i>@name</i>.</h3>
+                }
+                else
+                {
+                    <h3>Welcome, Guest!</h3>
+                }
                 <SalesOrders.Client.Shared.Components.UserButton />
             </div>
 
@@ -19,9 +27,18 @@
 
 
 @code{
-    bool _drawerOpen = false;
-    void DrawerToggle()
+    private string name = string.Empty;
+
+    protected override async Task OnInitializedAsync()
     {
-        _drawerOpen = !_drawerOpen;
+        // Get the current user's authentication state
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check if the user is authenticated and retrieve the user's name
+        if (user.Identity.IsAuthenticated)
+        {
+            name = user.Identity.Name ?? "Unknown User";
+        }
     }
 }
