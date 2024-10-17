@@ -20,13 +20,14 @@ namespace SalesOrders.DAL.Models
 
         public virtual DbSet<OrderHeader> OrderHeader { get; set; }
         public virtual DbSet<OrderLine> OrderLine { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=FAM001251\\SQLEXPRESS01;Initial Catalog=SalesOrderDB;Integrated Security=True");
+                optionsBuilder.UseSqlServer("Data Source=FAM001251\\SQLEXPRESS01;Initial Catalog=SalesOrderDB;Integrated Security=True;Encrypt=True");
             }
         }
 
@@ -80,6 +81,34 @@ namespace SalesOrders.DAL.Models
                     .HasForeignKey(d => d.orderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__OrderLine__order__3B75D760");
+            });
+
+            modelBuilder.Entity<Users>(entity =>
+            {
+                entity.HasKey(e => e.userId)
+                    .HasName("PK__Users__CB9A1CFF451C93E2");
+
+                entity.HasIndex(e => e.email, "UQ__Users__AB6E6164AFAF458C")
+                    .IsUnique();
+
+                entity.Property(e => e.dateCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.email)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.passwordHash).IsRequired();
+
+                entity.Property(e => e.passwordSalt).IsRequired();
+
+                entity.Property(e => e.role)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('Customer')");
             });
 
             OnModelCreatingPartial(modelBuilder);
