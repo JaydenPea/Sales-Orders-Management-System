@@ -1,12 +1,52 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+@*             <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" /> *@
+
+            @* <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <h1>We're Sorry</h1>
+                    <p>You're not authorized to reach this page. You need to log in.</p>
+
+                    <span>Don't have an account? <a href="/login">Login now</a></span>
+
+                </NotAuthorized>
+            </AuthorizeRouteView> *@
+
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized Context="routeNotAuthorizedContext">
+                    <CascadingAuthenticationState>
+                        <AuthorizeView>
+                            <Authorized Context="authViewAuthorizedContext">
+                                <!-- User is logged in but not authorized -->
+                                <h1>We're Sorry</h1>
+                                <p>You're logged in, but you don't have permission to view this page.</p>
+                            </Authorized>
+                            <NotAuthorized Context="authViewNotAuthorizedContext">
+                                <!-- User is not logged in -->
+                                <h1>You're not logged in</h1>
+                                <p>You need to log in to access this page.</p>
+                                <span>Don't have an account? <a href="/register">Register now</a></span>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+
+</CascadingAuthenticationState>
+
+
+
+
+

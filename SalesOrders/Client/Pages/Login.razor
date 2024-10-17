@@ -1,0 +1,85 @@
+﻿@page "/login"
+@layout LoginLayout
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
+@inject IAuthService AuthService
+
+@using SalesOrders.Client.Service.AuthService
+@using SalesOrders.Shared.Users.Models
+
+
+<PageTitle>Login</PageTitle>
+
+<!-- Centered login container -->
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow" style="width: 400px;">
+        <h3 class="text-center">Login</h3>
+
+        <EditForm Model="user" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <InputText id="email" @bind-Value="user.Email" class="form-control" />
+                <ValidationMessage For="@(() => user.Email)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
+                <ValidationMessage For="@(() => user.Password)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+
+            <!-- Register link -->
+            <div class="text-center mt-3">
+                <span>Don't have an account? <a href="/register">Register now</a></span>
+            </div>
+        </EditForm>
+
+        <!-- Error message -->
+        <div class="text-danger text-center mt-2">
+            <span>@errorMessage</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserLogin user = new UserLogin();
+    private string errorMessage = string.Empty;
+    private string returnUrl = string.Empty;
+
+    #region Methods
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
+        {
+            returnUrl = url;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        var result = await AuthService.Login(user);
+        if (result.Success)
+        {
+            errorMessage = string.Empty;
+
+            //Store authToken in local storage.(to be used to authenticate access to apis.)
+            await LocalStorage.SetItemAsync("authToken", result.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateTo(returnUrl);
+        }
+        else
+        {
+            errorMessage = result.Message;
+        }
+    }
+    #endregion
+}

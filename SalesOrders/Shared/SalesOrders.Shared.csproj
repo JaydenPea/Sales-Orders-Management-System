@@ -9,4 +9,8 @@
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\SalesOrders.DAL\SalesOrders.DAL.csproj" />
+	</ItemGroup>
 </Project>
