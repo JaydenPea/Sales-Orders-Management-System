@@ -3,14 +3,13 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
-<div class="dropdown">
-
+<div class="dropdown position-relative">
     <button @onclick="ToggleUserMenu"
             @onfocusout="HideUserMenu"
             class="btn btn-secondary dropdown-toggle user-button">
         <i class="oi oi-person"></i>
     </button>
-    <div class="dropdown-menu dropdown-menu-right @UserMenuCssClass">
+    <div class="dropdown-menu custom-dropdown-menu @UserMenuCssClass">
         <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
             <Authorized>
                 <a href="profile" class="dropdown-item">Profile</a>
@@ -23,7 +22,6 @@
             </NotAuthorized>
         </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
     </div>
-
 </div>
 
 @code {

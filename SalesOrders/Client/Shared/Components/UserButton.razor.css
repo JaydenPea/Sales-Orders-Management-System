@@ -1,5 +1,5 @@
-﻿﻿.show-menu {
-    display: block;
+﻿.show-menu {
+    display: block !important;
 }
 
 .user-button {
@@ -12,4 +12,24 @@
 
 .dropdown-item:hover {
     background-color: white;
+}
+
+/* Custom dropdown styling to ensure it's positioned correctly */
+.custom-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto; /* Ensures it aligns with the right edge */
+    min-width: 10rem;
+    z-index: 1000;
+    padding: .5rem 0;
+    margin: 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: .25rem;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .175);
 }

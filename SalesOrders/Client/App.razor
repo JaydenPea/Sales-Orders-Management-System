@@ -15,7 +15,7 @@
             </AuthorizeRouteView> *@
 
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized Context="routeNotAuthorizedContext">
+                <NotAuthorized>
                     <CascadingAuthenticationState>
                         <AuthorizeView>
                             <Authorized Context="authViewAuthorizedContext">
