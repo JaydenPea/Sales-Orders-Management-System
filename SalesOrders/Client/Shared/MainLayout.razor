@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@using MudBlazor;
+
 
     <div class="page">
         <div class="sidebar">
@@ -26,8 +28,11 @@
     </div>
 
 
+
 @code{
     private string name = string.Empty;
+    private MudThemeProvider _mudThemeProvider;
+    private bool isDarkMode { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,4 +46,6 @@
             name = user.Identity.Name ?? "Unknown User";
         }
     }
+
+   
 }

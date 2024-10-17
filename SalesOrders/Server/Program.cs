@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SalesOrders.Client.Service.AuthService;
 using SalesOrders.DAL.Models;
 using SalesOrders.Shared.ExternalCalls;
+using SalesOrders.Shared.Orders;
 using SalesOrders.Shared.User;
 
 
@@ -29,6 +30,7 @@ builder.Services.AddSwaggerGen();
 #region Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IExternalCallService, ExteernalCallService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 #endregion
 
 #region Authentication 
