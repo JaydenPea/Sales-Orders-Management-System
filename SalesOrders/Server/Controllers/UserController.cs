@@ -21,31 +21,47 @@ namespace SalesOrders.Server.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegister request)
         {
-            var response = await _authService.Register(
-                new SalesOrders.DAL.Models.Users
-                {
-                    email = request.email
-                },
-                request.password);
-
-            if (!response.Success)
+            try
             {
-                return BadRequest(response);
-            }
+                var response = await _authService.Register(
+               new SalesOrders.DAL.Models.Users
+               {
+                   email = request.email
+               },
+               request.password);
 
-            return Ok(response);
+                if (!response.Success)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<ServiceResponse<string>>> Login(UserLogin request)
         {
-            var response = await _authService.Login(request.Email, request.Password);
-            if (!response.Success)
+            try
             {
-                return BadRequest(response);
-            }
+                var response = await _authService.Login(request.Email, request.Password);
+                if (!response.Success)
+                {
+                    return BadRequest(response);
+                }
 
-            return Ok(response);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
     }
 }

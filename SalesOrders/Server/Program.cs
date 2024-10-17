@@ -4,16 +4,20 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using SalesOrders.Client.Service.AuthService;
 using SalesOrders.DAL.Models;
+using SalesOrders.Shared.ExternalCalls;
 using SalesOrders.Shared.User;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+#region Context
 builder.Services.AddDbContext<SalesOrderDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+#endregion
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -22,7 +26,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+#region Services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IExternalCallService, ExteernalCallService>();
+#endregion
+
+#region Authentication 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -36,6 +45,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
+
+#endregion
+
+
 builder.Services.AddHttpContextAccessor();
 
 #region Cors
