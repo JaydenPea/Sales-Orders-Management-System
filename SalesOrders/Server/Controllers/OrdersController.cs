@@ -50,7 +50,7 @@ namespace SalesOrders.Server.Controllers
             }
         }
 
-        [HttpPut("updateOrder"), Authorize(Roles = "Admin")]
+        [HttpPut("updateOrder"), /*Authorize(Roles = "Admin")*/]
         public async Task<ActionResult<ServiceResponse<List<viewOrdersVM>>>> UpdateOrder(viewOrdersVM order)
         {
             try

@@ -17,10 +17,9 @@ namespace SalesOrders.Client.Service.OrdersService
             _http = http;
             _authStateProvider = authStateProvider;
         }
-
-        
-
         #endregion
+
+
         public event Action OnChange;
         public List<viewOrdersVM> viewOrdersVMs { get; set; } = new List<viewOrdersVM>();
         public async Task GetOrders(viewOrdersFilters filters)
@@ -61,6 +60,25 @@ namespace SalesOrders.Client.Service.OrdersService
             }
 
             
+        }
+
+        public Task AddOrder(viewOrdersVM view)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteOrder(viewOrdersVM view)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task UpdateOrder(viewOrdersVM view)
+        {
+            var response = await _http.PutAsJsonAsync("api/orders/updateOrder", view);
+            viewOrdersVMs = (await response.Content
+                .ReadFromJsonAsync<ServiceResponse<List<viewOrdersVM>>>()).Data;
+            //await GetOrders();
+            OnChange.Invoke();
         }
     }
 }

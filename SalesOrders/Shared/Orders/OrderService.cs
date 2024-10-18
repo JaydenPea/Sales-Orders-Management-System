@@ -97,6 +97,7 @@ namespace SalesOrders.Shared.Orders
             orderCheck.orderType = order.orderType;
             orderCheck.orderNumber = order.orderNumber;
             orderCheck.orderStatus = order.orderStatus;
+            orderCheck.createdDate = order.createdDate;
             await _context.SaveChangesAsync();
 
             viewOrdersFilters filters = new viewOrdersFilters();
