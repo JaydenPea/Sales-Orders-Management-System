@@ -22,7 +22,7 @@ namespace SalesOrders.Server.Controllers
 
         [HttpGet]
         [Route("getOrders")]
-        public async Task<ActionResult<viewOrdersVM>> GetOrders([FromQuery] viewOrdersFilters filters)
+        public async Task<ActionResult<List<viewOrdersVM>>> GetOrders([FromQuery] viewOrdersFilters filters)
         {
             try
             {

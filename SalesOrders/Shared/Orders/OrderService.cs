@@ -76,6 +76,21 @@ namespace SalesOrders.Shared.Orders
             var result = orders.ToList();
             return result;
         }
+
+        public Task<ServiceResponse<List<viewOrdersVM>>> UpdateOrder(viewOrdersVM order)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResponse<List<viewOrdersVM>>> AddOrder(viewOrdersVM order)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResponse<List<viewOrdersVM>>> Delete(long id)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

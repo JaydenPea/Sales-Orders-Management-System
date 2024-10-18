@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,13 @@ namespace SalesOrders.Shared.Orders.Models
         public string customerName { get; set; } = string.Empty;
         public DateTime createdDate { get; set; }
         public List<OrderLineVM> orderLines { get; set; } = new List<OrderLineVM>();
+
+        [NotMapped]
+        public bool isEditing { get; set; } =false;
+        [NotMapped]
+        public bool isNew { get; set; } = false;
+        [NotMapped]
+        public bool showOrderLines { get; set; } = false;
 
     }
 
@@ -38,5 +46,9 @@ namespace SalesOrders.Shared.Orders.Models
         public decimal salesPrice { get; set; } = 0;
         public long quantity { get; set; }
 
+        [NotMapped]
+        public bool isEditing { get; set; } = false;
+        [NotMapped]
+        public bool isNew { get; set; } = false;
     }
 }

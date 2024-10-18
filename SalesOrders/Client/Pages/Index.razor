@@ -1,15 +1,192 @@
 ﻿@page "/"
-
+@using SalesOrders.Client.Service.OrdersService
+@using SalesOrders.Shared.Orders.Models
+@inject IOrderService Orders
 @attribute [Authorize]
 
-<PageTitle>Home</PageTitle>
 
+<PageTitle>Orders</PageTitle>
 
-<AuthorizeView>
-    <h3>Hi! <i>@context.User.Identity.Name</i>.</h3>
-</AuthorizeView>
+<div class="header">
+    <div class="col">Order Number</div>
+    <div class="col">Customer Name</div>
+    <div class="col">Order Type</div>
+    <div class="col">Created Date</div>
+    <div class="col">Status</div>
+    <div class="col">Actions</div> <!-- Added column for actions to match the row structure -->
+</div>
 
+@foreach (var order in Orders.viewOrdersVMs)
+{
+    @if (order.isEditing)
+    {
+        <EditForm Model="editingOrder" OnSubmit="UpdateOrder">
+            <div class="row">
+                <div class="col">
+                    <InputText @bind-Value="editingOrder.customerName" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <InputText @bind-Value="editingOrder.orderType" class="form-control"></InputText>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="oi oi-cloud-upload"></i>
+                    </button>
+                    <button class="btn btn-primary" @onclick="CancelEditing">
+                        <i class="oi oi-circle-x"></i>
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col">
+                @order.orderNumber
+            </div>
+            <div class="col">
+                @order.customerName
+            </div>
+            <div class="col">
+                @order.orderType
+            </div>
+            <div class="col">
+                @order.createdDate.ToShortDateString()
+            </div>
+            <div class="col">
+                @order.orderStatus
+            </div>
 
-@code{
+            <div class="col">
+                <button class="btn btn-primary" @onclick="(() => EditOrder(order))">
+                    <i class="oi oi-pencil"></i>
+                </button>
+                <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))">
+                    <i class="oi oi-trash"></i>
+                </button>
+                <button class="btn btn-secondary" @onclick="(() => ToggleOrderLines(order))">
+                    <i class="oi oi-chevron-down"></i> View Order Lines
+                </button>
+            </div>
+            @if (order.showOrderLines)
+            {
+                <div class="row">
+                   
+                        <strong>Order Lines:</strong>
+                   
+                </div>
+                @foreach (var line in order.orderLines)
+                {
+                    if (line.isEditing)
+                    {
 
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col">Line #: @line.lineNumber</div>
+                            <div class="col">Product Code: @line.productCode</div>
+                            <div class="col">Product Type: @line.productType</div>
+                            <div class="col">Quantity: @line.quantity</div>
+                            <div class="col">Cost Price: @line.costPrice</div>
+                            <div class="col">Sales Price: @line.salesPrice</div>
+                        </div>
+                    }
+                   
+                }
+            }
+        </div>
+    }
 }
+
+@code {
+    private viewOrdersFilters filters = new viewOrdersFilters();
+    viewOrdersVM editingOrder = null;
+    private bool isLoading = true;
+    private string errorMessage = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            filters.orderType = string.Empty;
+            filters.from = DateTime.MinValue;
+            filters.to = DateTime.MinValue;
+            filters.productCode = string.Empty;
+
+            await Orders.GetOrders(filters);
+            Orders.OnChange += StateHasChanged;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void EditOrder(viewOrdersVM order)
+    {
+        order.isEditing = true;
+        editingOrder = order;
+    }
+
+    private async Task UpdateOrder()
+    {
+        editingOrder.isEditing = false;
+        // Save logic here
+    }
+
+    private async Task CancelEditing()
+    {
+        editingOrder = new viewOrdersVM();
+        isLoading = true;
+        filters.orderType = string.Empty;
+        filters.from = DateTime.MinValue;
+        filters.to = DateTime.MinValue;
+        filters.productCode = string.Empty;
+
+        await Orders.GetOrders(filters);
+    }
+
+    private async Task DeleteOrder(long id)
+    {
+        // Delete logic here
+    }
+
+    private void ToggleOrderLines(viewOrdersVM order)
+    {
+        order.showOrderLines = !order.showOrderLines; // Toggle the visibility of the order lines
+    }
+}
+
+<style>
+    .header, .row {
+        display: flex;
+        padding: 8px;
+    }
+
+    .col {
+        flex: 1;
+        padding: 8px;
+    }
+
+        .col:last-child {
+            text-align: right;
+        }
+
+    .btn {
+        margin-left: 4px;
+    }
+
+    .header .col {
+        font-weight: bold;
+        border-bottom: 2px solid lightgray;
+    }
+
+   
+</style>

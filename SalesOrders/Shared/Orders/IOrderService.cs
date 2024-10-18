@@ -10,5 +10,8 @@ namespace SalesOrders.Shared.Orders
     public interface IOrderService
     {
         Task<List<viewOrdersVM>> GetOrders(viewOrdersFilters filters);
+        Task<ServiceResponse<List<viewOrdersVM>>> UpdateOrder(viewOrdersVM order);
+        Task<ServiceResponse<List<viewOrdersVM>>> AddOrder(viewOrdersVM order);
+        Task<ServiceResponse<List<viewOrdersVM>>> Delete(long id);
     }
 }
