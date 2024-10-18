@@ -2,37 +2,81 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using MudBlazor;
 
+<MudThemeProvider @ref="_mudThemeProvider" Theme="@_mudTheme"></MudThemeProvider>
+<MudDialogProvider FullWidth="true" DisableBackdropClick="false" CloseButton="true" Position="DialogPosition.TopCenter" />
+<MudSnackbarProvider />
 
-    <div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
+    <MudLayout>
+        <MudAppBar Elevation="0" Dense="false">
+            <MudIconButton OnClick="@((e) => DrawerToggle())" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+            <MudSpacer />
 
-        <main>
-            <div class="top-row px-2">
-                @if (!string.IsNullOrEmpty(name))
-                {
-                    <h3>Hi! <i>@name</i>.</h3>
-                }
-                else
-                {
-                    <h3>Welcome, Guest!</h3>
-                }
-                <SalesOrders.Client.Shared.Components.UserButton />
-            </div>
+                    @if (!string.IsNullOrEmpty(name))
+                    {
+                        <h3>Hi! <i>@name</i>.</h3>
+                    }
+                    else
+                    {
+                        <h3>Welcome, Guest!</h3>
+                    }
+                    <SalesOrders.Client.Shared.Components.UserButton />
 
-            <article class="content px-4">
+        </MudAppBar>
+         <MudDrawer @bind-Open="_drawerOpen" Variant="@DrawerVariant.Mini" Elevation="1" Width="180px" PreserveOpenState="false">
+            <MudDrawerHeader Class="px-3 py-3">
+
+            </MudDrawerHeader>
+        <NavMenu isSideNavOpen="_drawerOpen" />
+        </MudDrawer>
+
+
+
+        <MudMainContent Class="py-16 px-16 | relative min-height-screen mud-height-full">
+            <MudContainer MaxWidth="MaxWidth.ExtraLarge">
                 @Body
-            </article>
-        </main>
-    </div>
+            </MudContainer>
+        </MudMainContent>
+
+        @*----- Footer ----- *@
+    <MudMainContent Class="py-16 px-16 | relative" >
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="" >
+            <MudDivider />
+            <MudGrid>
+                <MudItem xs="6">
+                    <div Class="d-flex align-center justify-start py-8">
+                        
+                        <MudText Typo="Typo.body2" Class="ml-4">Copyright © 2024</MudText>
+                    </div>
+                </MudItem>
+                <MudItem xs="6">
+                    <div Class="d-flex align-center justify-end py-8 mud-width-full">
+                        <div class="d-inline-flex align-center gap-4">
+                            
+                        </div>
+                    </div>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </MudMainContent>
+
+    </MudLayout>
 
 
-
-@code{
+@code {
     private string name = string.Empty;
+    private MudTheme _mudTheme = new MudTheme();  // Define the theme
     private MudThemeProvider _mudThemeProvider;
     private bool isDarkMode { get; set; } = true;
+
+    bool _drawerOpen = false;
+    bool _drawerNotificationOpen { get; set; } = false;
+
+    bool _profileMenuOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,6 +90,4 @@
             name = user.Identity.Name ?? "Unknown User";
         }
     }
-
-   
 }
