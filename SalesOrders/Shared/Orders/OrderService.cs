@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SalesOrders.DAL.Models;
 using SalesOrders.Shared.Orders.Models;
 using System;
@@ -25,7 +26,7 @@ namespace SalesOrders.Shared.Orders
 
         #region Service Methods
 
-        public async Task<List<viewOrdersVM>> GetOrders(viewOrdersFilters filters)
+        public async Task<ServiceResponse<List<viewOrdersVM>>> GetOrders(viewOrdersFilters filters)
         {
             var orders = from OH in _context.OrderHeader
                          select new viewOrdersVM()
@@ -74,22 +75,118 @@ namespace SalesOrders.Shared.Orders
             #endregion
 
             var result = orders.ToList();
-            return result;
+            return new ServiceResponse<List<viewOrdersVM>>
+            {
+                Data = result
+            };
         }
 
-        public Task<ServiceResponse<List<viewOrdersVM>>> UpdateOrder(viewOrdersVM order)
+        public async Task<ServiceResponse<List<viewOrdersVM>>> UpdateOrder(viewOrdersVM order)
         {
-            throw new NotImplementedException();
+            var orderCheck = await GetOrderById(order.orderId);
+            if(orderCheck == null)
+            {
+                return new ServiceResponse<List<viewOrdersVM>>
+                {
+                    Success = false,
+                    Message = "Order not found."
+                };
+            }
+
+            orderCheck.customerName = order.customerName;
+            orderCheck.orderType = order.orderType;
+            orderCheck.orderNumber = order.orderNumber;
+            orderCheck.orderStatus = order.orderStatus;
+            await _context.SaveChangesAsync();
+
+            viewOrdersFilters filters = new viewOrdersFilters();
+            return await GetOrders(filters);
         }
 
-        public Task<ServiceResponse<List<viewOrdersVM>>> AddOrder(viewOrdersVM order)
+        public async Task<ServiceResponse<List<viewOrdersVM>>> AddOrder(viewOrdersVM order)
         {
-            throw new NotImplementedException();
+            order.isEditing = order.isNew = false;
+
+            //add header
+
+            OrderHeader orderHeader = new OrderHeader()
+            {
+                orderNumber = order.orderNumber,
+                orderType = order.orderType,
+                orderStatus = order.orderStatus,
+                customerName = order.customerName,
+                createdDate = order.createdDate,
+            };
+
+            _context.OrderHeader.Add(orderHeader);
+
+            long lineNumber = 0;
+            foreach(var lineItem in order.orderLines)
+            {
+                //auto increment line number foreach line item linked to the header.
+                lineNumber++;
+
+                //add line items for the header.
+                OrderLine orderLine = new OrderLine()
+                {
+                    orderId = orderHeader.orderId,
+                    lineNumber = lineNumber,
+                    productCode = lineItem.productCode,
+                    productType = lineItem.productType,
+                    costPrice = lineItem.costPrice,
+                    salesPrice = lineItem.salesPrice,
+                    quantity = lineItem.quantity,
+                };
+
+                _context.OrderHeader.Add(orderHeader);
+            }
+
+            //save changes to the db
+            await _context.SaveChangesAsync();
+            viewOrdersFilters filters = new viewOrdersFilters();
+            return await GetOrders(filters);
         }
 
-        public Task<ServiceResponse<List<viewOrdersVM>>> Delete(long id)
+        public async Task<ServiceResponse<List<viewOrdersVM>>> Delete(long id)
         {
-            throw new NotImplementedException();
+            //Delete header item and all line items linked to it. This is going to be a hard delete.
+            var orderHeader = await _context.OrderHeader.FirstOrDefaultAsync(o => o.orderId == id);
+
+            // Check if the order exists
+            if (orderHeader == null)
+            {
+                return new ServiceResponse<List<viewOrdersVM>>
+                {
+                    Success = false,
+                    Message = "Order not found."
+                };
+            }
+
+            // Retrieve all the line items linked to this order header
+            var orderLines = await _context.OrderLine.Where(ol => ol.orderId == id).ToListAsync();
+
+            // Remove all the order lines associated with the order header
+            if (orderLines.Any())
+            {
+                _context.OrderLine.RemoveRange(orderLines);
+            }
+
+            // Remove the order header itself
+            _context.OrderHeader.Remove(orderHeader);
+            await _context.SaveChangesAsync();
+
+            viewOrdersFilters filters = new viewOrdersFilters();
+            return await GetOrders(filters);
+
+
+
+        }
+        #endregion
+
+        #region Private helpers
+        private async Task<OrderHeader> GetOrderById(long id)
+        {
+            return await _context.OrderHeader.FirstOrDefaultAsync(c => c.orderId == id);
         }
         #endregion
     }

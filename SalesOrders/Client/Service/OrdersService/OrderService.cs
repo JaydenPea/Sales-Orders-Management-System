@@ -51,9 +51,9 @@ namespace SalesOrders.Client.Service.OrdersService
            
             try
             {
-                var response = await _http.GetFromJsonAsync<List<viewOrdersVM>>($"api/orders/getOrders{queryString}");
+                var response = await _http.GetFromJsonAsync<ServiceResponse<List<viewOrdersVM>>>($"api/orders/getOrders{queryString}");
                 if (response != null)
-                    viewOrdersVMs = response;
+                    viewOrdersVMs = response.Data;
             }
             catch (Exception ex)
             {
