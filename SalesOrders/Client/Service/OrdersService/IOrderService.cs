@@ -10,5 +10,6 @@ namespace SalesOrders.Client.Service.OrdersService
         Task AddOrder(viewOrdersVM view);
         Task DeleteOrder(viewOrdersVM view);
         Task UpdateOrder(viewOrdersVM view);
+        Task UpdateOrderLine(OrderLineVM view);
     }
 }

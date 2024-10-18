@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using MudBlazor;
+@using System.Security.Claims
 
 <MudThemeProvider @ref="_mudThemeProvider" Theme="@_mudTheme"></MudThemeProvider>
 <MudDialogProvider FullWidth="true" DisableBackdropClick="false" CloseButton="true" Position="DialogPosition.TopCenter" />
@@ -13,8 +14,19 @@
 
                     @if (!string.IsNullOrEmpty(name))
                     {
-                        <h3>Hi! <i>@name</i>.</h3>
+                        <div class="d-flex flex-column align-items-center">
+                            <h3>Hi! <i>@name</i>.</h3>
+                            @if (!string.IsNullOrEmpty(role))
+                            {
+                                <p class="role-text">(<strong>@role</strong>)</p>
+                            }
+                            else
+                            {
+                                <p class="role-text">(No role assigned)</p>
+                            }
+                        </div>
                     }
+
                     else
                     {
                         <h3>Welcome, Guest!</h3>
@@ -64,6 +76,7 @@
 
 @code {
     private string name = string.Empty;
+    private string role = string.Empty;
     private MudTheme _mudTheme = new MudTheme();  // Define the theme
     private MudThemeProvider _mudThemeProvider;
     private bool isDarkMode { get; set; } = true;
@@ -88,6 +101,19 @@
         if (user.Identity.IsAuthenticated)
         {
             name = user.Identity.Name ?? "Unknown User";
+            var roles = user.Claims
+                        .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+                        .Select(c => c.Value)
+                        .ToList();
+
+            if (roles.Any())
+            {
+                role = string.Join(", ", roles); 
+            }
+            else
+            {
+                role = "No role assigned";
+            }
         }
     }
 }

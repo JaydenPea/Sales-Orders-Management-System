@@ -1,9 +1,12 @@
 ﻿@page "/"
 @using SalesOrders.Client.Service.OrdersService
 @using SalesOrders.Shared.Orders.Models
+@using System.Security.Claims
 @inject IOrderService Orders
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
-
+@implements IDisposable
 
 <PageTitle>Orders</PageTitle>
 
@@ -52,10 +55,10 @@
                 </div>
 
                 <div class="col">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
                         <i class="oi oi-cloud-upload"></i>
                     </button>
-                    <button class="btn btn-primary" @onclick="CancelEditing">
+                    <button class="btn btn-primary" @onclick="CancelEditing" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
                         <i class="oi oi-circle-x"></i>
                     </button>
                 </div>
@@ -81,14 +84,14 @@
                 @order.orderStatus
             </div>
 
-            <div class="col">
-                <button class="btn btn-primary" @onclick="(() => EditOrder(order))">
+            <div class="col" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                <button class="btn btn-primary" @onclick="(() => EditOrder(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
                     <i class="oi oi-pencil"></i>
                 </button>
-                <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))">
+                <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
                     <i class="oi oi-trash"></i>
                 </button>
-                <button class="btn btn-secondary" @onclick="(() => ToggleOrderLines(order))">
+                <button class="btn btn-secondary" @onclick="(() => ToggleOrderLines(order))" title="View Order Lines">
                     <i class="oi oi-chevron-down"></i> View Order Lines
                 </button>
             </div>
@@ -162,14 +165,30 @@
 @code {
     private viewOrdersFilters filters = new viewOrdersFilters();
     viewOrdersVM editingOrder = null;
+    OrderLineVM orderLine = null;
     private bool isLoading = true;
     private string errorMessage = null;
+    private string role = null;
+    private bool isAdmin = false;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             isLoading = true;
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            // Check if the user is authenticated and retrieve the user's role
+            if (user.Identity.IsAuthenticated)
+            {
+                role = user.Claims
+                        .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+                        .Select(c => c.Value).FirstOrDefault();
+                isAdmin = role == "Admin";
+            }
+
             filters.orderType = string.Empty;
             filters.from = DateTime.MinValue;
             filters.to = DateTime.MinValue;
@@ -188,6 +207,11 @@
         }
     }
 
+    public void Dispose()
+    {
+        Orders.OnChange -= StateHasChanged;
+    }
+
     private void EditOrder(viewOrdersVM order)
     {
         order.isEditing = true;
@@ -196,14 +220,25 @@
 
     private async Task UpdateOrder()
     {
-        if (editingOrder.isNew)
+        try
         {
-            await Orders.AddOrder(editingOrder);
+            if (editingOrder.isNew)
+            {
+
+                await Orders.AddOrder(editingOrder);
+            }
+            else
+            {
+                await Orders.UpdateOrder(editingOrder);
+                Snackbar.Add("Order Updated Successfully", Severity.Success);
+
+            }
+
+            editingOrder = new viewOrdersVM();  // Clear the form after update
         }
-        else
+        catch (Exception ex)
         {
-            await Orders.UpdateOrder(editingOrder);
-            editingOrder = new viewOrdersVM();
+            Snackbar.Add($"Failed to update order: {ex.Message}", severity: Severity.Error);
         }
     }
 
@@ -241,8 +276,17 @@
 
     private async Task UpdateOrderLine(OrderLineVM line)
     {
-        line.isEditing = false;  // Exit editing mode after saving
-                                 // Implement logic to update the order line in the database or API call here
+        try
+        {
+            await Orders.UpdateOrderLine(line);
+            Snackbar.Add("Order Line Item Updated Successfully", Severity.Success);
+            line.isEditing = false;  // Set the order line back to view mode after saving
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to update order line item: {ex.Message}", severity: Severity.Error);
+        }
+   
     }
 
     private void CancelOrderLineEdit(OrderLineVM line)

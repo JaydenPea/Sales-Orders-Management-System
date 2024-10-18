@@ -80,5 +80,14 @@ namespace SalesOrders.Client.Service.OrdersService
             //await GetOrders();
             OnChange.Invoke();
         }
+
+        public async Task UpdateOrderLine(OrderLineVM view)
+        {
+            var response = await _http.PutAsJsonAsync("api/orders/updateOrderLine", view);
+            viewOrdersVMs = (await response.Content
+                .ReadFromJsonAsync<ServiceResponse<List<viewOrdersVM>>>()).Data;
+            //await GetOrders();
+            OnChange.Invoke();
+        }
     }
 }

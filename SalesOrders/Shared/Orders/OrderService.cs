@@ -43,6 +43,7 @@ namespace SalesOrders.Shared.Orders
                                            where OL.orderId == OH.orderId
                                            select new OrderLineVM()
                                            {
+                                               lineId = OL.lineId,
                                                lineNumber = OL.lineNumber,
                                                productCode = OL.productCode,
                                                productType = OL.productType,
@@ -182,12 +183,47 @@ namespace SalesOrders.Shared.Orders
 
 
         }
+
+        public async Task<ServiceResponse<List<viewOrdersVM>>> UpdateLineOrders(OrderLineVM order)
+        {
+
+                // Retrieve the existing line order by lineId
+                var lineOrder = await GetOrderLineById(order.lineId);
+                if (lineOrder == null)
+                {
+                    return new ServiceResponse<List<viewOrdersVM>>
+                    {
+                        Success = false,
+                        Message = $"Order line with ID {order.lineId} not found."
+                    };
+                }
+
+                // Update the properties of the line
+                lineOrder.productCode = order.productCode;
+                lineOrder.productType = order.productType;
+                lineOrder.costPrice = order.costPrice;
+                lineOrder.salesPrice = order.salesPrice;
+                lineOrder.quantity = order.quantity;
+
+                _context.OrderLine.Update(lineOrder);
+            
+
+            // Save the changes
+            await _context.SaveChangesAsync();
+            viewOrdersFilters filters = new viewOrdersFilters();
+            return await GetOrders(filters);
+        }
         #endregion
 
         #region Private helpers
         private async Task<OrderHeader> GetOrderById(long id)
         {
             return await _context.OrderHeader.FirstOrDefaultAsync(c => c.orderId == id);
+        }
+
+        private async Task<OrderLine> GetOrderLineById(long id)
+        {
+            return await _context.OrderLine.FirstOrDefaultAsync(c => c.lineId == id);
         }
         #endregion
     }

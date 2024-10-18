@@ -50,11 +50,17 @@ namespace SalesOrders.Server.Controllers
             }
         }
 
-        [HttpPut("updateOrder"), /*Authorize(Roles = "Admin")*/]
+        [HttpPut("updateOrder"), Authorize(Roles = "Admin")]
         public async Task<ActionResult<ServiceResponse<List<viewOrdersVM>>>> UpdateOrder(viewOrdersVM order)
         {
             try
             {
+                // Check if the user is an Admin
+                if (!User.IsInRole("Admin"))
+                {
+                    return Forbid("Only Admin can perform these tasks");
+                }
+
                 var response = await _orderService.UpdateOrder(order);
                 return Ok(response);
             }
@@ -70,6 +76,20 @@ namespace SalesOrders.Server.Controllers
             try
             {
                 var response = await _orderService.AddOrder(order);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("updateOrderLine")]
+        public async Task<ActionResult<ServiceResponse<List<viewOrdersVM>>>> UpdateLineOrders(OrderLineVM order)
+        {
+            try
+            {
+                var response = await _orderService.UpdateLineOrders(order);
                 return Ok(response);
             }
             catch (Exception ex)

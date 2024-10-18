@@ -39,6 +39,7 @@ namespace SalesOrders.Shared.Orders.Models
 
     public class OrderLineVM
     {
+        public long lineId { get; set; }
         public long lineNumber { get; set; }
         public string productCode { get; set; } = string.Empty;
         public string productType { get; set; } = string.Empty;
