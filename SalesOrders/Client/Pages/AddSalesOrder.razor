@@ -148,6 +148,7 @@
         {
             await Orders.AddOrder(order);
             Snackbar.Add($"Added new sales orders", severity: Severity.Success);
+            MudDialog.Close();
         }
         catch(Exception e)
         {

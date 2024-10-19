@@ -11,6 +11,33 @@
 
 <PageTitle>Orders</PageTitle>
 
+<EditForm Model="@filters">
+    <div class="row">
+        <div class="col">
+            <InputSelect @bind-Value="filters.orderType" class="form-control">
+                <option value="">All Types</option>
+                <option value="Normal">Normal</option>
+                <option value="Staff">Staff</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Perishable">Perishable</option>
+            </InputSelect>
+        </div>
+        <div class="col">
+            <input type="date" @bind="filters.from" class="form-control" placeholder="From Date" />
+        </div>
+        <div class="col">
+            <input type="date" @bind="filters.to" class="form-control" placeholder="To Date" />
+        </div>
+        <div class="col">
+            <InputText @bind-Value="filters.productCode" class="form-control" placeholder="Product Code" />
+        </div>
+        <div class="col">
+            <button class="btn btn-primary" @onclick="ApplyFilters">Apply Filters</button>
+        </div>
+    </div>
+</EditForm>
+
+
 <div class="header">
     <div class="col">Order Number</div>
     <div class="col">Customer Name</div>
@@ -179,7 +206,7 @@ else
     }
 
     <button class="btn btn-primary" @onclick="CreateNewOrder">
-        <i class="oi oi-plus"></i> Add new category
+        <i class="oi oi-plus"></i> Add new sales order
     </button>
 
 }
@@ -226,6 +253,19 @@ else
         {
             errorMessage = ex.Message;
             Snackbar.Add($"Error loading sales orders: {ex.Message}", severity: Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ApplyFilters()
+    {
+        isLoading = true;
+        try
+        {
+            await Orders.GetOrders(filters); // Use updated filter values
         }
         finally
         {
