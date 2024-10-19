@@ -1,0 +1,166 @@
+﻿@page "/addSalesOrder"
+@using SalesOrders.Client.Service.OrdersService
+@inject IOrderService Orders
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        @if (loading)
+        {
+            <span>@msg</span>
+        }
+        else
+        {
+            <h3>Create a new Sales Order</h3>
+
+            <EditForm Model="order" OnValidSubmit="AddNewSalesOrder">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="mb-0">
+                    <label for="title">Order Number</label>
+                    <InputText id="title" @bind-Value="order.orderNumber" class="form-control"></InputText>
+                </div>
+
+                <div class="mb-0">
+                    <label for="title">Customer Name</label>
+                    <InputText @bind-Value="order.customerName" class="form-control"></InputText>
+                </div>
+
+                <div class="mb-0">
+                    <label for="title">Select Order Type</label>
+                    <InputSelect @bind-Value="order.orderType" class="form-control">
+
+                        <option value="Normal">Normal</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Mechanical">Mechanical</option>
+                        <option value="Perishable">Perishable</option>
+                    </InputSelect>
+                </div>
+
+                <div class="mb-0">
+                    <label for="title">Select Date Created</label>
+                    <input type="datetime-local" @bind="order.createdDate" class="form-control" />
+                </div>
+
+                <div class="mb-0">
+                    <label for="title">Select Order Status</label>
+                    <InputSelect @bind-Value="order.orderStatus" class="form-control">
+
+                        <option value="New">New</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Complete">Complete</option>
+                    </InputSelect>
+                </div>
+                <hr />
+
+                <div class="header">
+                    <div class="col">Product Code</div>
+                    <div class="col">Product Type</div>
+                    <div class="col">Cost Price</div>
+                    <div class="col">Sales Price</div>
+                    <div class="col">Quantity</div>
+                    <div class="col"></div>
+                </div>
+                @foreach (var lineItem in order.orderLines)
+                {
+                    <div class="row">
+                        <div class="col">
+                            <InputText @bind-Value="lineItem.productCode" class="form-control"></InputText>
+                        </div>
+                        <div class="col">
+                            <InputSelect @bind-Value="lineItem.productType" class="form-control">
+
+                                <option value="Apparel">Apparel</option>
+                                <option value="Parts">Parts</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Motor">Motor</option>
+                            </InputSelect>
+                        </div>
+                        <div class="col">
+                            <InputNumber @bind-Value="lineItem.quantity" class="form-control"></InputNumber>
+                        </div>
+                        <div class="col">
+                            <InputNumber @bind-Value="lineItem.costPrice" class="form-control"></InputNumber>
+                        </div>
+                        <div class="col">
+                            <InputNumber @bind-Value="lineItem.salesPrice" class="form-control"></InputNumber>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary" @onclick="@(() => RemoveVariant(lineItem.lineId))">
+                                <i class="oi oi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+                <button type="button" class="btn btn-primary" @onclick="AddLineItem">
+                    <i class="oi oi-plus"></i> Add Variant
+                </button>
+
+                <hr />
+                <button type="submit" class="btn btn-primary float-end">@btnText</button>
+                <ValidationSummary></ValidationSummary>
+            </EditForm>
+        }
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+    bool loading = true;
+    string btnText = "";
+    string msg = "Loading...";
+
+    viewOrdersVM order = new viewOrdersVM();
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        order = new viewOrdersVM { isNew = true };
+        btnText = "Create Order";
+
+        loading = false;
+    }
+
+
+
+    void AddLineItem()
+    {
+        order.orderLines
+            .Add(new OrderLineVM { isNew = true});
+    }
+
+    void RemoveVariant(long lineId)
+    {
+        var variant = order.orderLines.Find(v => v.lineId == lineId);
+        if (variant == null)
+        {
+            return;
+        }
+        if (variant.isNew)
+        {
+            order.orderLines.Remove(variant);
+        }
+    }
+
+    async void AddNewSalesOrder()
+    {
+        try
+        {
+            await Orders.AddOrder(order);
+            Snackbar.Add($"Added new sales orders", severity: Severity.Success);
+        }
+        catch(Exception e)
+        {
+            Snackbar.Add($"Error new sales orders: {e.Message}", severity: Severity.Success);
+        }
+    }
+}
+
+<style>
+    .header, .row {
+        display: flex;
+        padding: 8px;
+    }
+
+
+</style>

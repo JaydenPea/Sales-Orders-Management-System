@@ -121,6 +121,7 @@ namespace SalesOrders.Shared.Orders
             };
 
             _context.OrderHeader.Add(orderHeader);
+            await _context.SaveChangesAsync();
 
             long lineNumber = 0;
             foreach(var lineItem in order.orderLines)
@@ -140,7 +141,7 @@ namespace SalesOrders.Shared.Orders
                     quantity = lineItem.quantity,
                 };
 
-                _context.OrderHeader.Add(orderHeader);
+                _context.OrderLine.Add(orderLine);
             }
 
             //save changes to the db

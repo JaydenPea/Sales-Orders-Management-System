@@ -62,9 +62,10 @@ namespace SalesOrders.Client.Service.OrdersService
             
         }
 
-        public Task AddOrder(viewOrdersVM view)
+        public async Task AddOrder(viewOrdersVM view)
         {
-            throw new NotImplementedException();
+            var response = await _http.PostAsJsonAsync("api/orders/addOrder", view);
+            response.EnsureSuccessStatusCode();
         }
 
         public async Task DeleteOrder(long id)

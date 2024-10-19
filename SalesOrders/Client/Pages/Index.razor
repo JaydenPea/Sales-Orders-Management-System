@@ -20,154 +20,171 @@
     <div class="col">Actions</div> 
 </div>
 
-@foreach (var order in Orders.viewOrdersVMs)
+@if (Orders.viewOrdersVMs == null)
 {
-    @if (order.isEditing)
+    <span>Loading Order...</span>
+}
+else
+{
+    @foreach (var order in Orders.viewOrdersVMs)
     {
-        <EditForm Model="editingOrder" OnSubmit="UpdateOrder">
+        @if (order.isEditing)
+        {
+            <EditForm Model="editingOrder" OnSubmit="UpdateOrder">
+                <div class="row">
+                    <div class="col">
+                        <InputText @bind-Value="editingOrder.orderNumber" class="form-control"></InputText>
+                    </div>
+                    <div class="col">
+                        <InputText @bind-Value="editingOrder.customerName" class="form-control"></InputText>
+                    </div>
+                    <div class="col">
+                        <InputSelect @bind-Value="editingOrder.orderType" class="form-control">
+                            
+                            <option value="Normal">Normal</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Perishable">Perishable</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="col">
+                        <input type="datetime-local" @bind="editingOrder.createdDate" class="form-control" />
+                    </div>
+
+                    <div class="col">
+                        <InputSelect @bind-Value="editingOrder.orderStatus" class="form-control">
+                            
+                            <option value="New">New</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Complete">Complete</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                            <i class="oi oi-cloud-upload"></i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="CancelEditing" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                            <i class="oi oi-circle-x"></i>
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+        else
+        {
             <div class="row">
                 <div class="col">
-                    <InputText @bind-Value="editingOrder.orderNumber" class="form-control"></InputText>
+                    @order.orderNumber
                 </div>
                 <div class="col">
-                    <InputText @bind-Value="editingOrder.customerName" class="form-control"></InputText>
+                    @order.customerName
                 </div>
                 <div class="col">
-                    <InputSelect @bind-Value="editingOrder.orderType" class="form-control">
-                        <option value="">Select Order Type</option> <!-- Default option -->
-                        <option value="Normal">Normal</option>
-                        <option value="Staff">Staff</option>
-                        <option value="Mechanical">Mechanical</option>
-                        <option value="Perishable">Perishable</option>
-                    </InputSelect>
+                    @order.orderType
                 </div>
-
                 <div class="col">
-                    <input type="datetime-local" @bind="editingOrder.createdDate" class="form-control" />
+                    @order.createdDate.ToShortDateString()
+                </div>
+                <div class="col">
+                    @order.orderStatus
                 </div>
 
-                <div class="col">
-                    <InputSelect @bind-Value="editingOrder.orderStatus" class="form-control">
-                        <option value="">Select Order Status</option> <!-- Default option -->
-                        <option value="New">New</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Complete">Complete</option>
-                    </InputSelect>
-                </div>
-
-                <div class="col">
-                    <button type="submit" class="btn btn-primary" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
-                        <i class="oi oi-cloud-upload"></i>
+                <div class="col" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                    <button class="btn btn-primary" @onclick="(() => EditOrder(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                        <i class="oi oi-pencil"></i>
                     </button>
-                    <button class="btn btn-primary" @onclick="CancelEditing" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
-                        <i class="oi oi-circle-x"></i>
+                    @* <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+        <i class="oi oi-trash"></i>
+        </button> *@
+
+                    <button class="btn btn-primary" @onclick="@((e) => OpenDeleteDialog(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                        <i class="oi oi-trash"></i>
+                    </button>
+
+                    <button class="btn btn-secondary" @onclick="(() => ToggleOrderLines(order))" title="View Order Lines">
+                        <i class="oi oi-chevron-down"></i> View Order Lines
                     </button>
                 </div>
-            </div>
-        </EditForm>
-    }
-    else
-    {
-        <div class="row">
-            <div class="col">
-                @order.orderNumber
-            </div>
-            <div class="col">
-                @order.customerName
-            </div>
-            <div class="col">
-                @order.orderType
-            </div>
-            <div class="col">
-                @order.createdDate.ToShortDateString()
-            </div>
-            <div class="col">
-                @order.orderStatus
-            </div>
-
-            <div class="col" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
-                <button class="btn btn-primary" @onclick="(() => EditOrder(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
-                    <i class="oi oi-pencil"></i>
-                </button>
-                @* <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
-                    <i class="oi oi-trash"></i>
-                </button> *@
-
-                <button class="btn btn-primary" @onclick="@((e) => OpenDeleteDialog(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
-                    <i class="oi oi-trash"></i>
-                 </button> *
-
-                <button class="btn btn-secondary" @onclick="(() => ToggleOrderLines(order))" title="View Order Lines">
-                    <i class="oi oi-chevron-down"></i> View Order Lines
-                </button>
-            </div>
-            @if (order.showOrderLines)
-            {
-                <div class="row">
-                    <strong>Order Lines:</strong>
-                </div>
-
-                @foreach (var line in order.orderLines)
+                @if (order.showOrderLines)
                 {
-                    if (line.isEditing)
+                    <div class="row">
+                        <strong>Order Lines:</strong>
+                    </div>
+
+                    @foreach (var line in order.orderLines)
                     {
-                        <EditForm Model="@line" OnSubmit="() => UpdateOrderLine(line)">
+                        if (line.isEditing)
+                        {
+                            <EditForm Model="@line" OnSubmit="() => UpdateOrderLine(line)">
+                                <div class="row">
+                                    <div class="col">
+                                        <InputText @bind-Value="line.productCode" class="form-control"></InputText>
+                                    </div>
+                                    <div class="col">
+
+                                        <InputSelect @bind-Value="line.productType" class="form-control">
+
+                                            <option value="Apparel">Apparel</option>
+                                            <option value="Parts">Parts</option>
+                                            <option value="Equipment">Equipment</option>
+                                            <option value="Motor">Motor</option>
+                                        </InputSelect>
+
+                                    </div>
+                                    <div class="col">
+                                        <InputNumber @bind-Value="line.quantity" class="form-control"></InputNumber>
+                                    </div>
+                                    <div class="col">
+                                        <InputNumber @bind-Value="line.costPrice" class="form-control"></InputNumber>
+                                    </div>
+                                    <div class="col">
+                                        <InputNumber @bind-Value="line.salesPrice" class="form-control"></InputNumber>
+                                    </div>
+
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-primary">
+                                            Save
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" @onclick="() => CancelOrderLineEdit(line)">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        }
+                        else
+                        {
                             <div class="row">
-                                <div class="col">
-                                    <InputText @bind-Value="line.productCode" class="form-control"></InputText>
-                                </div>
-                                <div class="col">
-                                    <InputText @bind-Value="line.productType" class="form-control"></InputText>
-                                </div>
-                                <div class="col">
-                                    <InputNumber @bind-Value="line.quantity" class="form-control"></InputNumber>
-                                </div>
-                                <div class="col">
-                                    <InputNumber @bind-Value="line.costPrice" class="form-control"></InputNumber>
-                                </div>
-                                <div class="col">
-                                    <InputNumber @bind-Value="line.salesPrice" class="form-control"></InputNumber>
-                                </div>
+                                <div class="col">Line #: @line.lineNumber</div>
+                                <div class="col">Product Code: @line.productCode</div>
+                                <div class="col">Product Type: @line.productType</div>
+                                <div class="col">Quantity: @line.quantity</div>
+                                <div class="col">Cost Price: @line.costPrice</div>
+                                <div class="col">Sales Price: @line.salesPrice</div>
 
                                 <div class="col">
-                                    <button type="submit" class="btn btn-primary">
-                                        Save
-                                    </button>
-                                    <button type="button" class="btn btn-secondary" @onclick="() => CancelOrderLineEdit(line)">
-                                        Cancel
+                                    <button class="btn btn-primary" @onclick="() => EditOrderLine(line)">
+                                        Edit
                                     </button>
                                 </div>
                             </div>
-                        </EditForm>
-                    }
-                    else
-                    {
-                        <div class="row">
-                            <div class="col">Line #: @line.lineNumber</div>
-                            <div class="col">Product Code: @line.productCode</div>
-                            <div class="col">Product Type: @line.productType</div>
-                            <div class="col">Quantity: @line.quantity</div>
-                            <div class="col">Cost Price: @line.costPrice</div>
-                            <div class="col">Sales Price: @line.salesPrice</div>
-
-                            <div class="col">
-                                <button class="btn btn-primary" @onclick="() => EditOrderLine(line)">
-                                    Edit
-                                </button>
-                            </div>
-                        </div>
+                        }
                     }
                 }
-            }
 
-        </div>
+            </div>
+        }
     }
+
+    <button class="btn btn-primary" @onclick="CreateNewOrder">
+        <i class="oi oi-plus"></i> Add new category
+    </button>
+
 }
 
-@* <button class="btn btn-primary" @onclick="CreateNewCategory">
-    <i class="oi oi-plus"></i> Add new category
-</button>
- *@
+ 
 @code {
     [Inject]
     public IDialogService DialogService { get; set; }
@@ -213,6 +230,33 @@
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task CreateNewOrder()
+    {
+        var options = new DialogOptions
+            {
+                FullScreen = false,
+                DisableBackdropClick = false,
+                CloseButton = true,
+                MaxWidth = MaxWidth.Large,
+            };
+
+        var dialog = DialogService.Show<AddSalesOrder>("Add Order", options);
+
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            editingOrder = new viewOrdersVM();
+            isLoading = true;
+            filters.orderType = string.Empty;
+            filters.from = DateTime.MinValue;
+            filters.to = DateTime.MinValue;
+            filters.productCode = string.Empty;
+
+            await Orders.GetOrders(filters);
         }
     }
 
@@ -268,7 +312,7 @@
         editingOrder = order;
         var options = new DialogOptions
             {
-                
+
                 DisableBackdropClick = false,
                 CloseButton = true,
             };
@@ -314,10 +358,7 @@
         order.showOrderLines = !order.showOrderLines; // Toggle the visibility of the order lines
     }
 
-    private void CreateNewOrder(viewOrdersVM order)
-    {
-        // editingOrder = Orders.AddOrder(order);
-    }
+ 
 
     private void EditOrderLine(OrderLineVM line)
     {

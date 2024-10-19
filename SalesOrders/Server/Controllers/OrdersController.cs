@@ -84,7 +84,7 @@ namespace SalesOrders.Server.Controllers
             }
         }
 
-        [HttpPut("updateOrderLine")]
+        [HttpPut("updateOrderLine"), Authorize(Roles = "Admin")]
         public async Task<ActionResult<ServiceResponse<List<viewOrdersVM>>>> UpdateLineOrders(OrderLineVM order)
         {
             try
