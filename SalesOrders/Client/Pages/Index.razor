@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using SalesOrders.Client.Components
 @using SalesOrders.Client.Service.OrdersService
 @using SalesOrders.Shared.Orders.Models
 @using System.Security.Claims
@@ -88,9 +89,14 @@
                 <button class="btn btn-primary" @onclick="(() => EditOrder(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
                     <i class="oi oi-pencil"></i>
                 </button>
-                <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                @* <button class="btn btn-primary" @onclick="(() => DeleteOrder(order.orderId))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
                     <i class="oi oi-trash"></i>
-                </button>
+                </button> *@
+
+                <button class="btn btn-primary" @onclick="@((e) => OpenDeleteDialog(order))" disabled="@(!isAdmin)" title="@(!isAdmin ? "You don't have permission to perform this task" : null)">
+                    <i class="oi oi-trash"></i>
+                 </button> *
+
                 <button class="btn btn-secondary" @onclick="(() => ToggleOrderLines(order))" title="View Order Lines">
                     <i class="oi oi-chevron-down"></i> View Order Lines
                 </button>
@@ -163,6 +169,8 @@
 </button>
  *@
 @code {
+    [Inject]
+    public IDialogService DialogService { get; set; }
     private viewOrdersFilters filters = new viewOrdersFilters();
     viewOrdersVM editingOrder = null;
     OrderLineVM orderLine = null;
@@ -200,6 +208,7 @@
         catch (Exception ex)
         {
             errorMessage = ex.Message;
+            Snackbar.Add($"Error loading sales orders: {ex.Message}", severity: Severity.Error);
         }
         finally
         {
@@ -254,9 +263,50 @@
         await Orders.GetOrders(filters);
     }
 
+    private async Task OpenDeleteDialog(viewOrdersVM order)
+    {
+        editingOrder = order;
+        var options = new DialogOptions
+            {
+                
+                DisableBackdropClick = false,
+                CloseButton = true,
+            };
+
+        var parameters = new DialogParameters
+        {
+            { "viewOrders", editingOrder }
+        };
+
+        var dialog = DialogService.Show<DeleteSalesOrder>("Delete Order", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            editingOrder = new viewOrdersVM();
+            isLoading = true;
+            filters.orderType = string.Empty;
+            filters.from = DateTime.MinValue;
+            filters.to = DateTime.MinValue;
+            filters.productCode = string.Empty;
+
+            await Orders.GetOrders(filters);
+        }
+    }
+
     private async Task DeleteOrder(long id)
     {
-        // Delete logic here
+        try
+        {
+            await Orders.DeleteOrder(id);
+            Snackbar.Add("Order deleted Successfully", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            Snackbar.Add($"Error deleting sales orders, please try again: {ex.Message}", severity: Severity.Error);
+        }
     }
 
     private void ToggleOrderLines(viewOrdersVM order)

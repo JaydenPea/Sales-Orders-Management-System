@@ -67,9 +67,13 @@ namespace SalesOrders.Client.Service.OrdersService
             throw new NotImplementedException();
         }
 
-        public Task DeleteOrder(viewOrdersVM view)
+        public async Task DeleteOrder(long id)
         {
-            throw new NotImplementedException();
+            var response = await _http.DeleteAsync($"api/orders/deleteOrder/{id}");
+            viewOrdersVMs = (await response.Content
+                .ReadFromJsonAsync<ServiceResponse<List<viewOrdersVM>>>()).Data;
+            //await GetOrders();
+            OnChange.Invoke();
         }
 
         public async Task UpdateOrder(viewOrdersVM view)

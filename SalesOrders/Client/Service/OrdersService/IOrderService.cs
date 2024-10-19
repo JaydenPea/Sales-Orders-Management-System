@@ -8,7 +8,7 @@ namespace SalesOrders.Client.Service.OrdersService
         List<viewOrdersVM> viewOrdersVMs { get; set; }
         Task GetOrders(viewOrdersFilters filters);
         Task AddOrder(viewOrdersVM view);
-        Task DeleteOrder(viewOrdersVM view);
+        Task DeleteOrder(long id);
         Task UpdateOrder(viewOrdersVM view);
         Task UpdateOrderLine(OrderLineVM view);
     }

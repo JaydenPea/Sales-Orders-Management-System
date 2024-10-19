@@ -1,0 +1,48 @@
+﻿@using SalesOrders.Client.Service.OrdersService
+@using SalesOrders.Shared.Orders.Models
+@inject IOrderService Orders
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText>Are you sure you want to delete this order:</MudText>
+        <MudText>
+            <div>
+                <MudElement Class="bold">Order Number:</MudElement> @viewOrders.orderNumber
+            </div>
+            <div>
+                <MudElement Class="bold">Customer Name:</MudElement> @viewOrders.customerName
+            </div>
+        </MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="RemoveSalesOrder">Delete Order</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [Parameter] public viewOrdersVM viewOrders { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private async Task RemoveSalesOrder()
+    {
+        try
+        {
+            long Id = viewOrders.orderId;
+            await Orders.DeleteOrder(Id);
+            Snackbar.Add("Order deleted Successfully", Severity.Success);
+            MudDialog.Close();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to delete order: {ex.Message}", severity: Severity.Error);
+        }
+        
+    }
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
