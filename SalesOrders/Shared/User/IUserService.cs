@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SalesOrders.DAL.Models;
+using SalesOrders.Shared.User.Models;
 
 namespace SalesOrders.Shared.User
 {
@@ -13,5 +14,8 @@ namespace SalesOrders.Shared.User
         Task<bool> UserExists(string email);
         Task<ServiceResponse<string>> Login(string email, string password);
         Task<SalesOrders.DAL.Models.Users> GetUserByEmail(string email);
+
+        //User management
+        Task<List<GetUsersModel>> GetAllUsers();
     }
 }

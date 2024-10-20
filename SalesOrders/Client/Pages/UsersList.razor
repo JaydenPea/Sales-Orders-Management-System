@@ -1,0 +1,160 @@
+﻿@page "/users"
+@using SalesOrders.Client.Service.OrdersService
+@using SalesOrders.Shared.Orders.Models
+@using System.Security.Claims
+@using SalesOrders.Shared.User.Models
+@inject IAuthService c
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
+
+<PageTitle>Users</PageTitle>
+
+@if (isLoading)
+{
+    <span>Loading Users...</span>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <span class="text-danger">@errorMessage</span>
+}
+else
+{
+    <div class="header">
+        <div class="col">User Email</div>
+        <div class="col">User Role</div>
+        <div class="col">Created Date</div>
+        @if (isAdmin)
+        {
+            <div class="col">Actions</div>
+        }
+    </div>
+
+    @foreach (var u in users)
+    {
+        @if (u.isEditing)
+        {
+            <EditForm Model="@editingUser" OnValidSubmit="UpdateUser">
+                <div class="row">
+                    <div class="col">
+                        <InputText @bind-Value="editingUser.email" class="form-control" readonly="true" />
+                    </div>
+                    <div class="col">
+                        <InputText @bind-Value="editingUser.role" class="form-control" />
+                    </div>
+                    <div class="col">
+                        @u.dateCreated
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col">@u.email</div>
+                <div class="col">@u.role</div>
+                <div class="col">@u.dateCreated</div>
+                @if (isAdmin)
+                {
+                    <div class="col">
+                        <button class="btn btn-primary" @onclick="() => EditUser(u)">Edit</button>
+                    </div>
+                }
+            </div>
+        }
+    }
+}
+
+@code {
+    private List<GetUsersModel> users = new List<GetUsersModel>();
+    private GetUsersModel editingUser = null;  // To hold the user being edited
+    private bool isLoading = true;
+    private string errorMessage = null;
+    private string role = null;
+    private bool isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                role = user.Claims
+                        .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+                        .Select(c => c.Value).FirstOrDefault();
+                isAdmin = role == "Admin";
+            }
+
+            users = await c.GetAllUsers();
+            c.OnChange += StateHasChanged;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            Snackbar.Add($"Error loading users list: {ex.Message}", severity: Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void EditUser(GetUsersModel user)
+    {
+        // Clone the user so changes aren't reflected until saved
+        editingUser = new GetUsersModel
+            {
+               
+                email = user.email,
+                role = user.role,
+                dateCreated = user.dateCreated,
+                isEditing = true
+            };
+
+        user.isEditing = true;  // Mark the user as editing in the main list
+    }
+
+    private void CancelEdit()
+    {
+        // Reset the editing state
+        if (editingUser != null)
+        {
+            // var user = users.FirstOrDefault(u => u.Id == editingUser.Id);
+            // if (user != null)
+            // {
+            //     user.isEditing = false;
+            // }
+            editingUser = null;
+        }
+    }
+
+    private async Task UpdateUser()
+    {
+        try
+        {
+            // Find the user in the list and update their info
+            // var user = users.FirstOrDefault(u => u.Id == editingUser.Id);
+            // if (user != null)
+            // {
+            //     user.role = editingUser.role;
+            //     user.isEditing = false;
+            // }
+
+            editingUser = null;
+            Snackbar.Add("User updated successfully!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error updating user: {ex.Message}", Severity.Error);
+        }
+    }
+}

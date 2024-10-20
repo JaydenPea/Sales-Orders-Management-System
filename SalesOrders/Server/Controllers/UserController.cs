@@ -3,6 +3,7 @@ using SalesOrders.Client.Service.AuthService;
 using SalesOrders.DAL.Models;
 using SalesOrders.Shared;
 using SalesOrders.Shared.User;
+using SalesOrders.Shared.User.Models;
 using SalesOrders.Shared.Users.Models;
 
 namespace SalesOrders.Server.Controllers
@@ -63,5 +64,20 @@ namespace SalesOrders.Server.Controllers
             }
             
         }
+
+        [HttpGet("getUsersList")]
+        public async Task<ActionResult<List<GetUsersModel>>> GetAllUsers()
+        {
+            try
+            {
+                var response = await _authService.GetAllUsers();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
+ 

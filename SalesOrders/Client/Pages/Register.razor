@@ -3,7 +3,8 @@
 @using SalesOrders.Client.Service.AuthService
 @using SalesOrders.Shared.Users.Models
 @inject IAuthService AuthService
-
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 
 <PageTitle>Register</PageTitle>
 
@@ -91,8 +92,14 @@
         var result = await AuthService.Register(user);
         message = result.Message;
         if (result.Success)
-            messageCssClass = "text-success";
+        {
+            Snackbar.Add($"Successfully added new user. ", severity: Severity.Success);
+            Navigation.NavigateTo("/login"); //redirect to login page
+        }
         else
-            messageCssClass = "text-danger";
+        {
+            Snackbar.Add($"Error adding new user", severity: Severity.Error);
+        }
+        
     }
 }

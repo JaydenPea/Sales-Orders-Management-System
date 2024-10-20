@@ -3,7 +3,8 @@
     <MudNavMenu>
         <MudNavLink Href="@home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Payments" IconColor="Color.Surface">Orders</MudNavLink>
         <MudNavLink Href="@external" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Api" IconColor="Color.Surface">Extrnal Api</MudNavLink>
-        <MudNavLink Href="@dashboard" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.AppsOutage" IconColor="Color.Surface">Analytics Dashboard</MudNavLink>
+        <MudNavLink Href="@dashboard" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Surface">Analytics Dashboard</MudNavLink>
+        <MudNavLink Href="@user" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Person" IconColor="Color.Surface">Users Management</MudNavLink>
 
     </MudNavMenu>
 }
@@ -21,6 +22,10 @@ else
 
         <MudTooltip Text="Analytics Dashboard" Arrow="true" Placement="Placement.Right">
             <MudNavLink Href="@dashboard" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Dashboard" IconColor="Color.Surface">Analytics Dashboard</MudNavLink>
+        </MudTooltip>
+
+        <MudTooltip Text="Users Management" Arrow="true" Placement="Placement.Right">
+            <MudNavLink Href="@user" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Person" IconColor="Color.Surface">Users Management</MudNavLink>
         </MudTooltip>
 
     </MudNavMenu>
@@ -42,4 +47,5 @@ else
     string external { get; } = "externalApi";
     string home { get; } = "";
     string dashboard { get; } = "analytics";
+    string user { get; } = "addUser";
 }

@@ -17,5 +17,7 @@ namespace SalesOrders.Shared.Users.Models
 
         [Required, Compare("password", ErrorMessage = "The passwords do not match....")]
         public string confirmPassword { get; set; } = string.Empty;
+
+        public string? role { get; set; } = string.Empty;
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SalesOrders.DAL.Models;
+using SalesOrders.Shared.User.Models;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -102,6 +103,19 @@ namespace SalesOrders.Shared.User
         public async Task<SalesOrders.DAL.Models.Users> GetUserByEmail(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.email.Equals(email));
+        }
+
+        public async Task<List<GetUsersModel>> GetAllUsers()
+        {
+            var users = from U in _context.Users
+                        select new GetUsersModel()
+                        {
+                            email = U.email,
+                            role = U.role,
+                            dateCreated = (DateTime)U.dateCreated
+                        };
+
+            return users.ToList();
         }
         #endregion
 

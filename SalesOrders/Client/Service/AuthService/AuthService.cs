@@ -2,6 +2,7 @@
 using SalesOrders.Shared.Users.Models;
 using SalesOrders.Shared;
 using System.Net.Http.Json;
+using SalesOrders.Shared.User.Models;
 
 namespace SalesOrders.Client.Service.AuthService
 {
@@ -36,6 +37,14 @@ namespace SalesOrders.Client.Service.AuthService
             var result = await _http.PostAsJsonAsync("api/user/register", request);
             return await result.Content.ReadFromJsonAsync<ServiceResponse<int>>();
         }
+
+        public async Task<List<GetUsersModel>> GetAllUsers()
+        {
+            var result = await _http.GetAsync("api/user/getUsersList");
+            return await result.Content.ReadFromJsonAsync<List<GetUsersModel>>();
+        }
+
+        public event Action OnChange;
         #endregion
     }
 }

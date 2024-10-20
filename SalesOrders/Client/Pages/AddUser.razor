@@ -1,0 +1,66 @@
+﻿@page "/addUser"
+@using SalesOrders.Client.Service.OrdersService
+@using SalesOrders.Shared.Users.Models
+@inject IOrderService Orders
+@inject ISnackbar Snackbar
+@attribute [Authorize]
+@inject IAuthService AuthService
+
+<PageTitle>Add User</PageTitle>
+
+<div >
+
+        <h3 class="text-center">Add User</h3>
+
+        <EditForm Model="user" OnValidSubmit="HandleRegistration">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <InputText id="email" @bind-Value="user.email" class="form-control" />
+                <ValidationMessage For="@(() => user.email)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <InputText id="password" @bind-Value="user.password" class="form-control" type="password" />
+                <ValidationMessage For="@(() => user.password)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="confirmPassword">Confirm Password</label>
+                <InputText id="confirmPassword" @bind-Value="user.confirmPassword" class="form-control" type="password" />
+                <ValidationMessage For="@(() => user.confirmPassword)" />
+            </div>
+
+             <div class="mb-3">
+                <label for="confirmPassword">Select Your Role</label>
+                <InputSelect @bind-Value="user.role" class="form-control">
+
+                        <option value="Customer">Customer</option>
+                        <option value="Admin">Admin</option>
+
+                    </InputSelect>
+             </div>
+
+            <button type="submit" class="btn btn-primary w-100">Add New User</button>
+
+@*             <!-- Login link -->
+            <div class="text-center mt-3">
+                <span>Already have an account? <a href="/login">Login now</a></span>
+            </div> *@
+        </EditForm>
+</div>
+
+@code {
+
+    UserRegister user = new UserRegister();
+    async Task HandleRegistration()
+    {
+        var result = await AuthService.Register(user);
+        if (result.Success)
+            Snackbar.Add($"Successfully added new user. ", severity: Severity.Success);
+        else
+            Snackbar.Add($"Error adding new user", severity: Severity.Error);
+    }
+}
