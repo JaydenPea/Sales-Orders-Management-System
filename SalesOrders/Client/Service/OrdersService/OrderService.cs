@@ -22,6 +22,7 @@ namespace SalesOrders.Client.Service.OrdersService
 
         public event Action OnChange;
         public List<viewOrdersVM> viewOrdersVMs { get; set; } = new List<viewOrdersVM>();
+
         public async Task GetOrders(viewOrdersFilters filters)
         {
             var queryString = new StringBuilder();
@@ -94,5 +95,28 @@ namespace SalesOrders.Client.Service.OrdersService
             //await GetOrders();
             OnChange.Invoke();
         }
+
+        public async Task<OrderTypeStatsVM> GetOrderTypeStats()
+        {
+            try
+            {
+                var response = await _http.GetFromJsonAsync<ServiceResponse<OrderTypeStatsVM>>($"api/orders/getOrderTypeStats");
+
+                if (response != null && response.Success)
+                {
+                    return response.Data;
+                }
+                else
+                {
+                    
+                    throw new Exception(response?.Message ?? "Failed to fetch order type stats.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while fetching order type stats: {ex.Message}");
+            }
+        }
+
     }
 }

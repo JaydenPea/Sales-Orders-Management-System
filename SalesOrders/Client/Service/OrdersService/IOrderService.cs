@@ -11,5 +11,8 @@ namespace SalesOrders.Client.Service.OrdersService
         Task DeleteOrder(long id);
         Task UpdateOrder(viewOrdersVM view);
         Task UpdateOrderLine(OrderLineVM view);
+
+        //OrderStats
+        Task<OrderTypeStatsVM> GetOrderTypeStats();
     }
 }

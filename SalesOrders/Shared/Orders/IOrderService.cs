@@ -14,5 +14,8 @@ namespace SalesOrders.Shared.Orders
         Task<ServiceResponse<List<viewOrdersVM>>> AddOrder(viewOrdersVM order);
         Task<ServiceResponse<List<viewOrdersVM>>> Delete(long id);
         Task<ServiceResponse<List<viewOrdersVM>>> UpdateLineOrders(OrderLineVM order);
+
+        //Orders Analytics
+        Task<ServiceResponse<OrderTypeStatsVM>> OrderTypeCount();
     }
 }

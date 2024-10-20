@@ -97,5 +97,20 @@ namespace SalesOrders.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("getOrderTypeStats")]
+        public async Task<ActionResult<ServiceResponse<OrderTypeStatsVM>>> OrderTypeCount()
+        {
+            try
+            {
+                var response = await _orderService.OrderTypeCount();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

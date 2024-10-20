@@ -11,6 +11,6 @@ namespace SalesOrders.Shared.Orders.Models
         public string orderType { get; set; } = string.Empty;
         public DateTime? from {  get; set; } = DateTime.MinValue;
         public DateTime? to { get; set; } = DateTime.MinValue;
-        public string productCode { get; set; } = string.Empty;
+        public string? productCode { get; set; } = string.Empty;
     }
 }

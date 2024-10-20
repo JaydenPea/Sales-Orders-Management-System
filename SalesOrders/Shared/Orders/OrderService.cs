@@ -73,8 +73,14 @@ namespace SalesOrders.Shared.Orders
                 }
             }
 
+            if(!string.IsNullOrEmpty(filters.productCode))
+            {
+                orders = orders.Where(x => x.orderLines.Any(ol => ol.productCode == filters.productCode));
+            }
+
             #endregion
 
+            //Materialize orders.
             var result = orders.ToList();
             return new ServiceResponse<List<viewOrdersVM>>
             {
@@ -213,6 +219,34 @@ namespace SalesOrders.Shared.Orders
             await _context.SaveChangesAsync();
             viewOrdersFilters filters = new viewOrdersFilters();
             return await GetOrders(filters);
+        }
+
+        public async Task<ServiceResponse<OrderTypeStatsVM>> OrderTypeCount()
+        {
+            var orderTypes = await _context.OrderHeader
+                                   .GroupBy(he => he.orderType)
+                                   .Select(group => new
+                                   {
+                                       OrderType = group.Key,
+                                       Count = group.LongCount() // Count the occurrences of each orderType
+                                   })
+                                   .ToListAsync();
+
+            // Create the result object
+            var result = new OrderTypeStatsVM
+            {
+                orderTypes = orderTypes.ToDictionary(ot => ot.OrderType, ot => ot.Count)
+                                       .Select(dict => new Dictionary<string, long>
+                                       {
+                                   { dict.Key, dict.Value }
+                                       }).ToList()
+            };
+
+            return new ServiceResponse<OrderTypeStatsVM>
+            {
+                Data = result,
+                Success = true
+            };
         }
         #endregion
 
