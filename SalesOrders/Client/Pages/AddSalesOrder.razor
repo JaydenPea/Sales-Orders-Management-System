@@ -2,6 +2,7 @@
 @using SalesOrders.Client.Service.OrdersService
 @inject IOrderService Orders
 @inject ISnackbar Snackbar
+@attribute [Authorize]
 
 <MudDialog>
     <DialogContent>
@@ -152,7 +153,7 @@
         }
         catch(Exception e)
         {
-            Snackbar.Add($"Error new sales orders: {e.Message}", severity: Severity.Success);
+            Snackbar.Add($"Error new sales orders: {e.Message}", severity: Severity.Info);
         }
     }
 }

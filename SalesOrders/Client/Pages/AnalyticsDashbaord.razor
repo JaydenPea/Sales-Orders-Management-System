@@ -3,9 +3,43 @@
 @inject IOrderService Orders
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@attribute [Authorize]
 
-<div id="chart"></div>
-<div id="LineChart"></div>
+<div class="container">
+    <div class="row">
+        <!-- Pie Chart -->
+        <div class="col-md-6">
+            <div id="chart"></div> <!-- Pie Chart div -->
+        </div>
+
+        <!-- Cards -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <mud-card class="card" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <mud-card-content class="text-center">
+                            <!-- Card content 1 -->
+                            <h4>Number of orders</h4>
+                            <p>@(orderHeaderStats != null ? orderHeaderStats.orderCount : "Loading...")</p>
+                        </mud-card-content>
+                    </mud-card>
+                </div>
+
+                <div class="col-md-6">
+                    <mud-card class="card" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <mud-card-content>
+                            <!-- Card content 2 -->
+                            <h4>Number of customers</h4>
+                            <p>@(orderHeaderStats != null ? orderHeaderStats.customerCount : "Loading...")</p>
+                        </mud-card-content>
+                    </mud-card>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="LineChart"></div> <!-- Line chart div -->
+
 
 @code {
     private OrderTypeStatsVM orderTypeStats;
@@ -51,21 +85,24 @@
             {
                 orderHeaderStats = lineChartResponse;
 
-                //prepare data for line chart
+                // Prepare data for line chart
                 var chartData = new
                 {
                     series = new[]
-                     {
+                    {
                         new
                         {
                             name = "Order Count",
                             data = orderHeaderStats.orderHeaders
-                                .GroupBy(oh => oh.Values.First()) // Group by createdDate
+                                .GroupBy(oh => oh.Values.First().Date) // Group by the Date (ignoring time)
                                 .Select(g => g.Count()) // Count the number of orders per date
                                 .ToArray() // Convert to array
                         }
                     },
-                    categories = orderHeaderStats.orderHeaders.Select(oh => oh.Values.First().ToString("yyyy-MM-dd")).ToArray() // created dates as categories
+                    categories = orderHeaderStats.orderHeaders
+                        .GroupBy(oh => oh.Values.First().Date) // Group by date again to get distinct dates
+                        .Select(g => g.Key.ToString("yyyy-MM-dd")) // Convert each date to string for the categories
+                        .ToArray() // Convert to array
                 };
 
                 // Pass the data to the JavaScript function
