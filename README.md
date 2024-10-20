@@ -91,6 +91,7 @@ The authentication system is built using Blazored.LocalStorage and a custom `Aut
 - Additional analytics features to provide more insights into sales trends.
 - More extensive role-based management with customizable permissions.
 - Additional API integrations for extending the system's capabilities.
+- Custom exporting(csv) based on selected setpoint.
 
 ---
 
