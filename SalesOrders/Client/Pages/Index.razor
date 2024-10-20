@@ -28,8 +28,11 @@
         <div class="col">
             <input type="date" @bind="filters.to" class="form-control" placeholder="To Date" />
         </div>
-        <div class="col">
+    @*     <div class="col">
             <InputText @bind-Value="filters.productCode" class="form-control" placeholder="Product Code" />
+        </div> *@
+        <div class="col">
+            <InputText @bind-Value="searchQuery" class="form-control" placeholder="Search by Product Code" />
         </div>
         <div class="col">
             <button class="btn btn-primary" @onclick="ApplyFilters">Apply Filters</button>
@@ -222,6 +225,7 @@ else
     private string errorMessage = null;
     private string role = null;
     private bool isAdmin = false;
+    private string searchQuery = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -265,6 +269,10 @@ else
         isLoading = true;
         try
         {
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                filters.productCode = searchQuery;
+            }
             await Orders.GetOrders(filters); // Use updated filter values
         }
         finally

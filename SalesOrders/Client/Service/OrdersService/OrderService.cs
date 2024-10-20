@@ -26,29 +26,47 @@ namespace SalesOrders.Client.Service.OrdersService
         public async Task GetOrders(viewOrdersFilters filters)
         {
             var queryString = new StringBuilder();
+            bool hasQueryStarted = false;
+
             if (!string.IsNullOrEmpty(filters.orderType))
             {
                 queryString.Append($"?orderType={filters.orderType}");
+                hasQueryStarted = true; // Query string starts with '?'
             }
-            
 
             if (filters.from != DateTime.MinValue)
             {
-                queryString.Append($"&from={filters.from?.ToString("yyyy-MM-dd")}");
+                if (hasQueryStarted)
+                    queryString.Append($"&from={filters.from?.ToString("yyyy-MM-dd")}");
+                else
+                {
+                    queryString.Append($"?from={filters.from?.ToString("yyyy-MM-dd")}");
+                    hasQueryStarted = true;
+                }
             }
 
             if (filters.to != DateTime.MinValue)
             {
-                queryString.Append($"&to={filters.to?.ToString("yyyy-MM-dd")}");
+                if (hasQueryStarted)
+                    queryString.Append($"&to={filters.to?.ToString("yyyy-MM-dd")}");
+                else
+                {
+                    queryString.Append($"?to={filters.to?.ToString("yyyy-MM-dd")}");
+                    hasQueryStarted = true;
+                }
             }
 
             if (!string.IsNullOrEmpty(filters.productCode))
             {
-                queryString.Append($"&productCode={filters.productCode}");
+                if (hasQueryStarted)
+                    queryString.Append($"&productCode={filters.productCode}");
+                else
+                    queryString.Append($"?productCode={filters.productCode}");
             }
 
+
             // Make the API call with the query string
-           
+
             try
             {
                 var response = await _http.GetFromJsonAsync<ServiceResponse<List<viewOrdersVM>>>($"api/orders/getOrders{queryString}");
