@@ -14,5 +14,6 @@ namespace SalesOrders.Client.Service.OrdersService
 
         //OrderStats
         Task<OrderTypeStatsVM> GetOrderTypeStats();
+        Task<OrderHeaderStatsVM> GetHeaderStats();
     }
 }

@@ -17,5 +17,6 @@ namespace SalesOrders.Shared.Orders
 
         //Orders Analytics
         Task<ServiceResponse<OrderTypeStatsVM>> OrderTypeCount();
+        Task<ServiceResponse<OrderHeaderStatsVM>> OrderHeaderStats();
     }
 }

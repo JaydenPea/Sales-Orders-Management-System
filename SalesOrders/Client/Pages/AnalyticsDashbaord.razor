@@ -5,9 +5,11 @@
 @inject NavigationManager Navigation
 
 <div id="chart"></div>
+<div id="LineChart"></div>
 
 @code {
     private OrderTypeStatsVM orderTypeStats;
+    private OrderHeaderStatsVM orderHeaderStats;
 
     //Issues to do research on: 
     //Blazor’s client-side navigation not triggering a full page reload. - causing js to not render even though it is available. 
@@ -43,6 +45,32 @@
                 // Pass the data to the JavaScript function
                 await JS.InvokeVoidAsync("renderChart", chartData);
             }
-        }
+
+            var lineChartResponse = await Orders.GetHeaderStats();
+            if (lineChartResponse != null)
+            {
+                orderHeaderStats = lineChartResponse;
+
+                //prepare data for line chart
+                var chartData = new
+                {
+                    series = new[]
+                     {
+                        new
+                        {
+                            name = "Order Count",
+                            data = orderHeaderStats.orderHeaders
+                                .GroupBy(oh => oh.Values.First()) // Group by createdDate
+                                .Select(g => g.Count()) // Count the number of orders per date
+                                .ToArray() // Convert to array
+                        }
+                    },
+                    categories = orderHeaderStats.orderHeaders.Select(oh => oh.Values.First().ToString("yyyy-MM-dd")).ToArray() // created dates as categories
+                };
+
+                // Pass the data to the JavaScript function
+                await JS.InvokeVoidAsync("lineChart", chartData);
+            }
+        } 
     }
 }

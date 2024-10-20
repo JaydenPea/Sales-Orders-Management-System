@@ -248,6 +248,38 @@ namespace SalesOrders.Shared.Orders
                 Success = true
             };
         }
+
+        public async Task<ServiceResponse<OrderHeaderStatsVM>> OrderHeaderStats()
+        {
+            var stats = new OrderHeaderStatsVM();
+
+            var orderHeadersList = await _context.OrderHeader
+               .Select(oh => new { oh.orderNumber, oh.createdDate })
+               .ToListAsync();
+
+            // Build dictionary of order number and created date(can see trends of when customers place orders)
+            foreach (var order in orderHeadersList)
+            {
+                stats.orderHeaders.Add(new Dictionary<string, DateTime> { { order.orderNumber, order.createdDate } });
+            }
+
+            // Count all records in the OrderHeader table
+            stats.orderCount = await _context.OrderHeader.CountAsync();
+
+            // Get distinct customer names and count them
+            stats.customerCount = await _context.OrderHeader
+                .Select(oh => oh.customerName)
+                .Distinct()
+                .CountAsync();
+
+            // Return as a ServiceResponse
+            return new ServiceResponse<OrderHeaderStatsVM>
+            {
+                Data = stats,
+                Success = true,
+                Message = "Order header stats retrieved successfully"
+            };
+        }
         #endregion
 
         #region Private helpers

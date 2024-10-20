@@ -136,5 +136,26 @@ namespace SalesOrders.Client.Service.OrdersService
             }
         }
 
+        public async Task<OrderHeaderStatsVM> GetHeaderStats()
+        {
+            try
+            {
+                var response = await _http.GetFromJsonAsync<ServiceResponse<OrderHeaderStatsVM>>($"api/orders/getHeaderStats");
+
+                if (response != null && response.Success)
+                {
+                    return response.Data;
+                }
+                else
+                {
+
+                    throw new Exception(response?.Message ?? "Failed to fetch order type stats.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while fetching order type stats: {ex.Message}");
+            }
+        }
     }
 }

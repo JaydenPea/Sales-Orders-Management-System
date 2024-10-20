@@ -112,5 +112,20 @@ namespace SalesOrders.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("getHeaderStats")]
+        public async Task<ActionResult<ServiceResponse<OrderHeaderStatsVM>>> OrderHeaderStats()
+        {
+            try
+            {
+                var response = await _orderService.OrderHeaderStats();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
