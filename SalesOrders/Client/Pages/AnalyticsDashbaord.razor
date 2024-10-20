@@ -2,27 +2,47 @@
 @using SalesOrders.Client.Service.OrdersService
 @inject IOrderService Orders
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <div id="chart"></div>
 
 @code {
     private OrderTypeStatsVM orderTypeStats;
+
+    //Issues to do research on: 
+    //Blazor’s client-side navigation not triggering a full page reload. - causing js to not render even though it is available. 
+
+    //Immplemented a temp solution - when navigating to the page trigger a reload of the page ensuring all js is invoked correctly.
     protected override async Task OnInitializedAsync()
     {
-        var response = await Orders.GetOrderTypeStats();
-        if (response != null)
+        // Check if the URL has been reloaded by looking for the "reloaded=true" parameter
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var hasReloaded = uri.Query.Contains("reloaded=true");
+
+        if (!hasReloaded)
         {
-            orderTypeStats = response;
-
-            // Prepare data for the chart
-            var chartData = new
+            // Add a query parameter to the URL and reload the page
+            var newUri = $"{Navigation.Uri}?reloaded=true";
+            Navigation.NavigateTo(newUri, forceLoad: true); // Force full reload with query param
+        }
+        else
+        {
+            // Perform the normal operations after page reload
+            var response = await Orders.GetOrderTypeStats();
+            if (response != null)
             {
-                series = orderTypeStats.orderTypes.Select(ot => ot.Values.First()).ToArray(),
-                labels = orderTypeStats.orderTypes.Select(ot => ot.Keys.First()).ToArray()
-            };
+                orderTypeStats = response;
 
-            // Pass the data to the JavaScript function
-            await JS.InvokeVoidAsync("renderChart", chartData);
+                // Prepare data for the chart
+                var chartData = new
+                {
+                    series = orderTypeStats.orderTypes.Select(ot => ot.Values.First()).ToArray(),
+                    labels = orderTypeStats.orderTypes.Select(ot => ot.Keys.First()).ToArray()
+                };
+
+                // Pass the data to the JavaScript function
+                await JS.InvokeVoidAsync("renderChart", chartData);
+            }
         }
     }
 }
