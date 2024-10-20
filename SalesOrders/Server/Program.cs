@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using SalesOrders.Client.Service.AuthService;
 using SalesOrders.DAL.Models;
+using SalesOrders.Server.Middleware;
 using SalesOrders.Shared.ExternalCalls;
 using SalesOrders.Shared.Orders;
 using SalesOrders.Shared.User;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +21,7 @@ builder.Services.AddDbContext<SalesOrderDBContext>(options =>
 });
 #endregion
 
-
+builder.Host.UseSerilog();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -52,6 +54,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 builder.Services.AddHttpContextAccessor();
+
+#region Serilog
+var homeDirectory = Environment.GetEnvironmentVariable("HOME") ?? ".";
+var logDirectory = Path.Combine(homeDirectory, "LogFiles");
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("ApplicationName", builder.Environment.ApplicationName)
+    .Enrich.WithProperty("EnvironmentName", builder.Environment.EnvironmentName)
+    .Enrich.With(new SerilogMiddleware())
+      .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u1}] {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(
+          path: $"{logDirectory}/log.txt",
+          rollingInterval: RollingInterval.Day,
+          shared: true,
+          flushToDiskInterval: System.TimeSpan.FromSeconds(1),
+          outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u1}] {Message:lj}{NewLine}{Exception}{NewLine}{Properties:j}{NewLine}{CustomProperties}{NewLine}",
+          retainedFileCountLimit: 10
+      )
+
+);
+#endregion
 
 #region Cors
 builder.Services.AddCors(options =>
@@ -94,6 +120,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+app.UseSerilogRequestLogging();
 app.MapFallbackToFile("index.html");
 
 app.Run();

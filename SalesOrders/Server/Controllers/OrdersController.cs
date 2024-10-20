@@ -11,27 +11,31 @@ namespace SalesOrders.Server.Controllers
 {
     [Route("api/orders")]
     [ApiController]
-    //[Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ILogger<OrdersController> _logger;
 
-        public OrdersController(IOrderService orders)
+        public OrdersController(IOrderService orders, ILogger<OrdersController> logger)
         {
             _orderService = orders;
+            _logger = logger;
         }
-
+            
         [HttpGet]
         [Route("getOrders")]
         public async Task<ActionResult<ServiceResponse<List<viewOrdersVM>>>> GetOrders([FromQuery] viewOrdersFilters filters)
         {
+            _logger.LogInformation("GetOrders called with filters: {Filters}", filters);
             try
             {
                 var response = await _orderService.GetOrders(filters);
+                _logger.LogInformation("GetOrders completed successfully with {OrderCount} orders.", response.Data.Count);
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error occurred while getting orders with filters: {Filters}", filters);
                 return BadRequest(ex.Message);
             }
         }
